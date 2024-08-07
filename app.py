@@ -10,8 +10,8 @@ app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
 # Email settings
-EMAIL_ADDRESS = 'paragiswalkar1987@gmail.com'
-EMAIL_PASSWORD = 'qvtj ehvp rtkq gwzo'
+EMAIL_ADDRESS = 'your-email@example.com'
+EMAIL_PASSWORD = 'your-email-password'
 
 def send_email(subject, body, to):
     try:
@@ -134,7 +134,7 @@ def check_prices():
                     send_email(
                         subject=f'Buy Alert for {symbol}',
                         body=f'The price of {symbol} has fallen to {latest_close}, which is below the buy threshold of {buy_threshold}.',
-                        to='paragiswalkar1987@gmail.com'
+                        to='user@example.com'
                     )
                 except Exception as e:
                     print(f'Error in buy notification: {e}')
@@ -146,7 +146,7 @@ def check_prices():
                     send_email(
                         subject=f'Sell Alert for {symbol}',
                         body=f'The price of {symbol} has risen to {latest_close}, which is above the sell threshold of {sell_threshold}.',
-                        to='paragiswalkar1987@gmail.com'
+                        to='user@example.com'
                     )
                 except Exception as e:
                     print(f'Error in sell notification: {e}')
