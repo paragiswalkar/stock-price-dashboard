@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Stock Price Notifier{% endblock %}
+
+{% block content %}
+<div class="jumbotron">
+    <h1 class="display-4">Stock Price Notifier</h1>
+    <p class="lead">Monitor real-time stock prices and visualize historical data.</p>
+    <hr class="my-4">
+    <p>Select a stock to view its candlestick chart.</p>
+    <ul class="list-group">
+        {% for symbol in symbols %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <a href="/chart/{{ symbol }}">{{ symbol }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+    <a href="/check_prices" class="btn btn-primary mt-3">Check Prices</a>
+</div>
+{% endblock %}

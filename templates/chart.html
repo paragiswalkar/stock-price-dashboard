@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Chart - {{ symbol }}{% endblock %}
+
+{% block content %}
+<div class="jumbotron">
+    <h1 class="display-4">Candlestick Chart for {{ symbol }}</h1>
+    <div class="mt-4">
+        {{ chart_html | safe }}
+    </div>
+    <a href="/" class="btn btn-secondary mt-3">Back</a>
+</div>
+{% endblock %}
