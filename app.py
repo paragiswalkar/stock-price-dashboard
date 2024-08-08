@@ -1,17 +1,27 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
+from flask_socketio import SocketIO, emit
 import pandas as pd
 import plotly.graph_objects as go
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import os
+import random
+import time
+import threading
+import datetime
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
+socketio = SocketIO(app)
 
 # Email settings
 EMAIL_ADDRESS = 'your-email@example.com'
 EMAIL_PASSWORD = 'your-email-password'
+
+@socketio.on('connect')
+def handle_connect():
+    emit('my_event', {'data': 'Connected'}, broadcast=True)
 
 def send_email(subject, body, to):
     try:
@@ -159,5 +169,39 @@ def check_prices():
         flash(f'Error checking prices: {e}', 'danger')
     return redirect(url_for('index'))
 
-if __name__ == '__main__':
-    app.run(debug=True)
+@app.route('/live_chart/<symbol>')
+def live_chart(symbol):
+    return render_template('live_chart.html', symbol=symbol)
+
+def generate_live_data():
+    # Read the CSV file once
+    df = pd.read_csv('stocks.csv')
+    
+    while True:
+        try:
+            # Randomly select a symbol from the CSV
+            symbol = random.choice(df['symbol'].unique())
+            symbol_data = df[df['symbol'] == symbol]
+            
+            # Randomly select a row for the chosen symbol
+            row = symbol_data.sample(1).iloc[0]
+            
+            data = {
+                "time": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                "value": row['close']  # Use the 'close' value from the selected row
+            }
+            
+            # Emit the live data to all connected clients
+            socketio.emit('live_update', {"symbol": symbol, "data": data}, broadcast=True)
+
+            # Sleep for a while to simulate data generation interval
+            time.sleep(5)
+        except Exception as e:
+            print(f'Error in generating live data: {e}')
+@socketio.on('my_event')
+def handle_my_custom_event(json):
+    print('received json: ' + str(json))
+    emit('response', {'data': 'Message received'}, broadcast=True)
+    
+if __name__ == '__main__':    
+    socketio.run(app, debug=True)
